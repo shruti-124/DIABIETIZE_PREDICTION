@@ -1,0 +1,1773 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "e43f850a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:22.305737Z",
+     "iopub.status.busy": "2024-07-17T12:32:22.305305Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.305524Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.304291Z"
+    },
+    "papermill": {
+     "duration": 3.014207,
+     "end_time": "2024-07-17T12:32:25.308384",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:22.294177",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# GETTING SYSTEM READY\n",
+    "\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "\n",
+    "# for model buidling\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "from sklearn.model_selection import train_test_split, RandomizedSearchCV\n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.svm import SVC\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.ensemble import RandomForestClassifier\n",
+    "from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "2711dba4",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.328395Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.327818Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.333032Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.331880Z"
+    },
+    "papermill": {
+     "duration": 0.018085,
+     "end_time": "2024-07-17T12:32:25.335536",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.317451",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# IMPORTING THE DATASET"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "f5a65fb6",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.355409Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.354933Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.386861Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.385474Z"
+    },
+    "papermill": {
+     "duration": 0.045073,
+     "end_time": "2024-07-17T12:32:25.389674",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.344601",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "data=pd.read_csv(\"/kaggle/input/diabetes-dataset/Day2_Diabetes_Data.csv\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "452f4b17",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.409337Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.408887Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.414133Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.412849Z"
+    },
+    "papermill": {
+     "duration": 0.017908,
+     "end_time": "2024-07-17T12:32:25.416682",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.398774",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# DATA LOADING"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "2d1918d6",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.436721Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.436285Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.474362Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.473155Z"
+    },
+    "papermill": {
+     "duration": 0.051038,
+     "end_time": "2024-07-17T12:32:25.476935",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.425897",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Pregnancies</th>\n",
+       "      <th>Glucose</th>\n",
+       "      <th>BloodPressure</th>\n",
+       "      <th>SkinThickness</th>\n",
+       "      <th>Insulin</th>\n",
+       "      <th>BMI</th>\n",
+       "      <th>DiabetesPedigreeFunction</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>Outcome</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>6</td>\n",
+       "      <td>148</td>\n",
+       "      <td>72</td>\n",
+       "      <td>35</td>\n",
+       "      <td>0</td>\n",
+       "      <td>33.6</td>\n",
+       "      <td>0.627</td>\n",
+       "      <td>50</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>85</td>\n",
+       "      <td>66</td>\n",
+       "      <td>29</td>\n",
+       "      <td>0</td>\n",
+       "      <td>26.6</td>\n",
+       "      <td>0.351</td>\n",
+       "      <td>31</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>8</td>\n",
+       "      <td>183</td>\n",
+       "      <td>64</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>23.3</td>\n",
+       "      <td>0.672</td>\n",
+       "      <td>32</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>1</td>\n",
+       "      <td>89</td>\n",
+       "      <td>66</td>\n",
+       "      <td>23</td>\n",
+       "      <td>94</td>\n",
+       "      <td>28.1</td>\n",
+       "      <td>0.167</td>\n",
+       "      <td>21</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>137</td>\n",
+       "      <td>40</td>\n",
+       "      <td>35</td>\n",
+       "      <td>168</td>\n",
+       "      <td>43.1</td>\n",
+       "      <td>2.288</td>\n",
+       "      <td>33</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>763</th>\n",
+       "      <td>10</td>\n",
+       "      <td>101</td>\n",
+       "      <td>76</td>\n",
+       "      <td>48</td>\n",
+       "      <td>180</td>\n",
+       "      <td>32.9</td>\n",
+       "      <td>0.171</td>\n",
+       "      <td>63</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>764</th>\n",
+       "      <td>2</td>\n",
+       "      <td>122</td>\n",
+       "      <td>70</td>\n",
+       "      <td>27</td>\n",
+       "      <td>0</td>\n",
+       "      <td>36.8</td>\n",
+       "      <td>0.340</td>\n",
+       "      <td>27</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>765</th>\n",
+       "      <td>5</td>\n",
+       "      <td>121</td>\n",
+       "      <td>72</td>\n",
+       "      <td>23</td>\n",
+       "      <td>112</td>\n",
+       "      <td>26.2</td>\n",
+       "      <td>0.245</td>\n",
+       "      <td>30</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>766</th>\n",
+       "      <td>1</td>\n",
+       "      <td>126</td>\n",
+       "      <td>60</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>30.1</td>\n",
+       "      <td>0.349</td>\n",
+       "      <td>47</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>767</th>\n",
+       "      <td>1</td>\n",
+       "      <td>93</td>\n",
+       "      <td>70</td>\n",
+       "      <td>31</td>\n",
+       "      <td>0</td>\n",
+       "      <td>30.4</td>\n",
+       "      <td>0.315</td>\n",
+       "      <td>23</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>768 rows × 9 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     Pregnancies  Glucose  BloodPressure  SkinThickness  Insulin   BMI  \\\n",
+       "0              6      148             72             35        0  33.6   \n",
+       "1              1       85             66             29        0  26.6   \n",
+       "2              8      183             64              0        0  23.3   \n",
+       "3              1       89             66             23       94  28.1   \n",
+       "4              0      137             40             35      168  43.1   \n",
+       "..           ...      ...            ...            ...      ...   ...   \n",
+       "763           10      101             76             48      180  32.9   \n",
+       "764            2      122             70             27        0  36.8   \n",
+       "765            5      121             72             23      112  26.2   \n",
+       "766            1      126             60              0        0  30.1   \n",
+       "767            1       93             70             31        0  30.4   \n",
+       "\n",
+       "     DiabetesPedigreeFunction  Age  Outcome  \n",
+       "0                       0.627   50        1  \n",
+       "1                       0.351   31        0  \n",
+       "2                       0.672   32        1  \n",
+       "3                       0.167   21        0  \n",
+       "4                       2.288   33        1  \n",
+       "..                        ...  ...      ...  \n",
+       "763                     0.171   63        0  \n",
+       "764                     0.340   27        0  \n",
+       "765                     0.245   30        0  \n",
+       "766                     0.349   47        1  \n",
+       "767                     0.315   23        0  \n",
+       "\n",
+       "[768 rows x 9 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "377056fe",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.497712Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.497294Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.504979Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.503703Z"
+    },
+    "papermill": {
+     "duration": 0.021325,
+     "end_time": "2024-07-17T12:32:25.507710",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.486385",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(768, 9)"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "82bba67a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.529658Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.529241Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.554700Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.553338Z"
+    },
+    "papermill": {
+     "duration": 0.040152,
+     "end_time": "2024-07-17T12:32:25.557662",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.517510",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 768 entries, 0 to 767\n",
+      "Data columns (total 9 columns):\n",
+      " #   Column                    Non-Null Count  Dtype  \n",
+      "---  ------                    --------------  -----  \n",
+      " 0   Pregnancies               768 non-null    int64  \n",
+      " 1   Glucose                   768 non-null    int64  \n",
+      " 2   BloodPressure             768 non-null    int64  \n",
+      " 3   SkinThickness             768 non-null    int64  \n",
+      " 4   Insulin                   768 non-null    int64  \n",
+      " 5   BMI                       768 non-null    float64\n",
+      " 6   DiabetesPedigreeFunction  768 non-null    float64\n",
+      " 7   Age                       768 non-null    int64  \n",
+      " 8   Outcome                   768 non-null    int64  \n",
+      "dtypes: float64(2), int64(7)\n",
+      "memory usage: 54.1 KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "data.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "67defcaa",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.579653Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.579242Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.587416Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.586209Z"
+    },
+    "papermill": {
+     "duration": 0.022953,
+     "end_time": "2024-07-17T12:32:25.590473",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.567520",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "We have 9 numerical features : ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']\n",
+      "\n",
+      "We have 0 categorical features : []\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Defining numerical & categorical columns\n",
+    "numeric_features = [feature for feature in data.columns if data[feature].dtype != 'O']\n",
+    "categorical_features = [feature for feature in data.columns if data[feature].dtype == 'O']\n",
+    "\n",
+    "# print columns\n",
+    "print('We have {} numerical features : {}'.format(len(numeric_features), numeric_features))\n",
+    "print('\\nWe have {} categorical features : {}'.format(len(categorical_features), categorical_features))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "a8f5379f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.612538Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.612143Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.633282Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.631786Z"
+    },
+    "papermill": {
+     "duration": 0.035657,
+     "end_time": "2024-07-17T12:32:25.636022",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.600365",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing Value Presence in different columns of DataFrame are as follows : \n",
+      "**********************************************************************\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Total</th>\n",
+       "      <th>Percent</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Pregnancies</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Glucose</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>BloodPressure</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>SkinThickness</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Insulin</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>BMI</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>DiabetesPedigreeFunction</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Age</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Outcome</th>\n",
+       "      <td>0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          Total  Percent\n",
+       "Pregnancies                   0      0.0\n",
+       "Glucose                       0      0.0\n",
+       "BloodPressure                 0      0.0\n",
+       "SkinThickness                 0      0.0\n",
+       "Insulin                       0      0.0\n",
+       "BMI                           0      0.0\n",
+       "DiabetesPedigreeFunction      0      0.0\n",
+       "Age                           0      0.0\n",
+       "Outcome                       0      0.0"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print('Missing Value Presence in different columns of DataFrame are as follows : ')\n",
+    "print('*'*70)\n",
+    "total=data.isnull().sum().sort_values(ascending=False)\n",
+    "percent=(data.isnull().sum()/data.isnull().count()*100).sort_values(ascending=False)\n",
+    "pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "1b2c8b94",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.658241Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.657816Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.696044Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.694831Z"
+    },
+    "papermill": {
+     "duration": 0.052448,
+     "end_time": "2024-07-17T12:32:25.698650",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.646202",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Pregnancies</th>\n",
+       "      <th>Glucose</th>\n",
+       "      <th>BloodPressure</th>\n",
+       "      <th>SkinThickness</th>\n",
+       "      <th>Insulin</th>\n",
+       "      <th>BMI</th>\n",
+       "      <th>DiabetesPedigreeFunction</th>\n",
+       "      <th>Age</th>\n",
+       "      <th>Outcome</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "      <td>768.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>3.845052</td>\n",
+       "      <td>120.894531</td>\n",
+       "      <td>69.105469</td>\n",
+       "      <td>20.536458</td>\n",
+       "      <td>79.799479</td>\n",
+       "      <td>31.992578</td>\n",
+       "      <td>0.471876</td>\n",
+       "      <td>33.240885</td>\n",
+       "      <td>0.348958</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>3.369578</td>\n",
+       "      <td>31.972618</td>\n",
+       "      <td>19.355807</td>\n",
+       "      <td>15.952218</td>\n",
+       "      <td>115.244002</td>\n",
+       "      <td>7.884160</td>\n",
+       "      <td>0.331329</td>\n",
+       "      <td>11.760232</td>\n",
+       "      <td>0.476951</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.078000</td>\n",
+       "      <td>21.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>99.000000</td>\n",
+       "      <td>62.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>27.300000</td>\n",
+       "      <td>0.243750</td>\n",
+       "      <td>24.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>3.000000</td>\n",
+       "      <td>117.000000</td>\n",
+       "      <td>72.000000</td>\n",
+       "      <td>23.000000</td>\n",
+       "      <td>30.500000</td>\n",
+       "      <td>32.000000</td>\n",
+       "      <td>0.372500</td>\n",
+       "      <td>29.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>140.250000</td>\n",
+       "      <td>80.000000</td>\n",
+       "      <td>32.000000</td>\n",
+       "      <td>127.250000</td>\n",
+       "      <td>36.600000</td>\n",
+       "      <td>0.626250</td>\n",
+       "      <td>41.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>17.000000</td>\n",
+       "      <td>199.000000</td>\n",
+       "      <td>122.000000</td>\n",
+       "      <td>99.000000</td>\n",
+       "      <td>846.000000</td>\n",
+       "      <td>67.100000</td>\n",
+       "      <td>2.420000</td>\n",
+       "      <td>81.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       Pregnancies     Glucose  BloodPressure  SkinThickness     Insulin  \\\n",
+       "count   768.000000  768.000000     768.000000     768.000000  768.000000   \n",
+       "mean      3.845052  120.894531      69.105469      20.536458   79.799479   \n",
+       "std       3.369578   31.972618      19.355807      15.952218  115.244002   \n",
+       "min       0.000000    0.000000       0.000000       0.000000    0.000000   \n",
+       "25%       1.000000   99.000000      62.000000       0.000000    0.000000   \n",
+       "50%       3.000000  117.000000      72.000000      23.000000   30.500000   \n",
+       "75%       6.000000  140.250000      80.000000      32.000000  127.250000   \n",
+       "max      17.000000  199.000000     122.000000      99.000000  846.000000   \n",
+       "\n",
+       "              BMI  DiabetesPedigreeFunction         Age     Outcome  \n",
+       "count  768.000000                768.000000  768.000000  768.000000  \n",
+       "mean    31.992578                  0.471876   33.240885    0.348958  \n",
+       "std      7.884160                  0.331329   11.760232    0.476951  \n",
+       "min      0.000000                  0.078000   21.000000    0.000000  \n",
+       "25%     27.300000                  0.243750   24.000000    0.000000  \n",
+       "50%     32.000000                  0.372500   29.000000    0.000000  \n",
+       "75%     36.600000                  0.626250   41.000000    1.000000  \n",
+       "max     67.100000                  2.420000   81.000000    1.000000  "
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "8296cdfb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.722933Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.722453Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.742508Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.741155Z"
+    },
+    "papermill": {
+     "duration": 0.035725,
+     "end_time": "2024-07-17T12:32:25.745129",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.709404",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Pregnancies</th>\n",
+       "      <th>Glucose</th>\n",
+       "      <th>BloodPressure</th>\n",
+       "      <th>SkinThickness</th>\n",
+       "      <th>Insulin</th>\n",
+       "      <th>BMI</th>\n",
+       "      <th>DiabetesPedigreeFunction</th>\n",
+       "      <th>Age</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Outcome</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>3.298000</td>\n",
+       "      <td>109.980000</td>\n",
+       "      <td>68.184000</td>\n",
+       "      <td>19.664000</td>\n",
+       "      <td>68.792000</td>\n",
+       "      <td>30.304200</td>\n",
+       "      <td>0.429734</td>\n",
+       "      <td>31.190000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>4.865672</td>\n",
+       "      <td>141.257463</td>\n",
+       "      <td>70.824627</td>\n",
+       "      <td>22.164179</td>\n",
+       "      <td>100.335821</td>\n",
+       "      <td>35.142537</td>\n",
+       "      <td>0.550500</td>\n",
+       "      <td>37.067164</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         Pregnancies     Glucose  BloodPressure  SkinThickness     Insulin  \\\n",
+       "Outcome                                                                      \n",
+       "0           3.298000  109.980000      68.184000      19.664000   68.792000   \n",
+       "1           4.865672  141.257463      70.824627      22.164179  100.335821   \n",
+       "\n",
+       "               BMI  DiabetesPedigreeFunction        Age  \n",
+       "Outcome                                                  \n",
+       "0        30.304200                  0.429734  31.190000  \n",
+       "1        35.142537                  0.550500  37.067164  "
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.groupby('Outcome').mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "2dcdee6e",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.768835Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.768400Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.779510Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.778239Z"
+    },
+    "papermill": {
+     "duration": 0.026004,
+     "end_time": "2024-07-17T12:32:25.782095",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.756091",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Outcome\n",
+       "0    500\n",
+       "1    268\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data['Outcome'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "716068dd",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.807110Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.806664Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.811558Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.810425Z"
+    },
+    "papermill": {
+     "duration": 0.020439,
+     "end_time": "2024-07-17T12:32:25.814208",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.793769",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# MODEL BUILDING"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "57fea6e4",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.838440Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.838036Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.844706Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.843450Z"
+    },
+    "papermill": {
+     "duration": 0.021906,
+     "end_time": "2024-07-17T12:32:25.847328",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.825422",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# separating the data and labels\n",
+    "X = data.drop(columns = 'Outcome', axis=1) # Feature matrix\n",
+    "y = data['Outcome'] # Target variable"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "9867ceb7",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.872193Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.871733Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.890165Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.888796Z"
+    },
+    "papermill": {
+     "duration": 0.033889,
+     "end_time": "2024-07-17T12:32:25.892902",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.859013",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Pregnancies</th>\n",
+       "      <th>Glucose</th>\n",
+       "      <th>BloodPressure</th>\n",
+       "      <th>SkinThickness</th>\n",
+       "      <th>Insulin</th>\n",
+       "      <th>BMI</th>\n",
+       "      <th>DiabetesPedigreeFunction</th>\n",
+       "      <th>Age</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>6</td>\n",
+       "      <td>148</td>\n",
+       "      <td>72</td>\n",
+       "      <td>35</td>\n",
+       "      <td>0</td>\n",
+       "      <td>33.6</td>\n",
+       "      <td>0.627</td>\n",
+       "      <td>50</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>85</td>\n",
+       "      <td>66</td>\n",
+       "      <td>29</td>\n",
+       "      <td>0</td>\n",
+       "      <td>26.6</td>\n",
+       "      <td>0.351</td>\n",
+       "      <td>31</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>8</td>\n",
+       "      <td>183</td>\n",
+       "      <td>64</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>23.3</td>\n",
+       "      <td>0.672</td>\n",
+       "      <td>32</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>1</td>\n",
+       "      <td>89</td>\n",
+       "      <td>66</td>\n",
+       "      <td>23</td>\n",
+       "      <td>94</td>\n",
+       "      <td>28.1</td>\n",
+       "      <td>0.167</td>\n",
+       "      <td>21</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>0</td>\n",
+       "      <td>137</td>\n",
+       "      <td>40</td>\n",
+       "      <td>35</td>\n",
+       "      <td>168</td>\n",
+       "      <td>43.1</td>\n",
+       "      <td>2.288</td>\n",
+       "      <td>33</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>763</th>\n",
+       "      <td>10</td>\n",
+       "      <td>101</td>\n",
+       "      <td>76</td>\n",
+       "      <td>48</td>\n",
+       "      <td>180</td>\n",
+       "      <td>32.9</td>\n",
+       "      <td>0.171</td>\n",
+       "      <td>63</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>764</th>\n",
+       "      <td>2</td>\n",
+       "      <td>122</td>\n",
+       "      <td>70</td>\n",
+       "      <td>27</td>\n",
+       "      <td>0</td>\n",
+       "      <td>36.8</td>\n",
+       "      <td>0.340</td>\n",
+       "      <td>27</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>765</th>\n",
+       "      <td>5</td>\n",
+       "      <td>121</td>\n",
+       "      <td>72</td>\n",
+       "      <td>23</td>\n",
+       "      <td>112</td>\n",
+       "      <td>26.2</td>\n",
+       "      <td>0.245</td>\n",
+       "      <td>30</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>766</th>\n",
+       "      <td>1</td>\n",
+       "      <td>126</td>\n",
+       "      <td>60</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>30.1</td>\n",
+       "      <td>0.349</td>\n",
+       "      <td>47</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>767</th>\n",
+       "      <td>1</td>\n",
+       "      <td>93</td>\n",
+       "      <td>70</td>\n",
+       "      <td>31</td>\n",
+       "      <td>0</td>\n",
+       "      <td>30.4</td>\n",
+       "      <td>0.315</td>\n",
+       "      <td>23</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>768 rows × 8 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     Pregnancies  Glucose  BloodPressure  SkinThickness  Insulin   BMI  \\\n",
+       "0              6      148             72             35        0  33.6   \n",
+       "1              1       85             66             29        0  26.6   \n",
+       "2              8      183             64              0        0  23.3   \n",
+       "3              1       89             66             23       94  28.1   \n",
+       "4              0      137             40             35      168  43.1   \n",
+       "..           ...      ...            ...            ...      ...   ...   \n",
+       "763           10      101             76             48      180  32.9   \n",
+       "764            2      122             70             27        0  36.8   \n",
+       "765            5      121             72             23      112  26.2   \n",
+       "766            1      126             60              0        0  30.1   \n",
+       "767            1       93             70             31        0  30.4   \n",
+       "\n",
+       "     DiabetesPedigreeFunction  Age  \n",
+       "0                       0.627   50  \n",
+       "1                       0.351   31  \n",
+       "2                       0.672   32  \n",
+       "3                       0.167   21  \n",
+       "4                       2.288   33  \n",
+       "..                        ...  ...  \n",
+       "763                     0.171   63  \n",
+       "764                     0.340   27  \n",
+       "765                     0.245   30  \n",
+       "766                     0.349   47  \n",
+       "767                     0.315   23  \n",
+       "\n",
+       "[768 rows x 8 columns]"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "d9cfa117",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.918654Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.917884Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.927751Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.926505Z"
+    },
+    "papermill": {
+     "duration": 0.02567,
+     "end_time": "2024-07-17T12:32:25.930173",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.904503",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0      1\n",
+       "1      0\n",
+       "2      1\n",
+       "3      0\n",
+       "4      1\n",
+       "      ..\n",
+       "763    0\n",
+       "764    0\n",
+       "765    0\n",
+       "766    1\n",
+       "767    0\n",
+       "Name: Outcome, Length: 768, dtype: int64"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "cf34174a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.955145Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.954716Z",
+     "iopub.status.idle": "2024-07-17T12:32:25.959812Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.958534Z"
+    },
+    "papermill": {
+     "duration": 0.020456,
+     "end_time": "2024-07-17T12:32:25.962273",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.941817",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# DATA STANDARDIZATION"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "0c8bda8c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:25.987459Z",
+     "iopub.status.busy": "2024-07-17T12:32:25.987071Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.000261Z",
+     "shell.execute_reply": "2024-07-17T12:32:25.999164Z"
+    },
+    "papermill": {
+     "duration": 0.028943,
+     "end_time": "2024-07-17T12:32:26.002991",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:25.974048",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-1\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>StandardScaler()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-1\" type=\"checkbox\" checked><label for=\"sk-estimator-id-1\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div>"
+      ],
+      "text/plain": [
+       "StandardScaler()"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "scaler = StandardScaler()\n",
+    "scaler.fit(X)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "33bd608f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.029123Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.028660Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.040216Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.039059Z"
+    },
+    "papermill": {
+     "duration": 0.027744,
+     "end_time": "2024-07-17T12:32:26.042831",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.015087",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[ 0.63994726,  0.84832379,  0.14964075, ...,  0.20401277,\n",
+       "         0.46849198,  1.4259954 ],\n",
+       "       [-0.84488505, -1.12339636, -0.16054575, ..., -0.68442195,\n",
+       "        -0.36506078, -0.19067191],\n",
+       "       [ 1.23388019,  1.94372388, -0.26394125, ..., -1.10325546,\n",
+       "         0.60439732, -0.10558415],\n",
+       "       ...,\n",
+       "       [ 0.3429808 ,  0.00330087,  0.14964075, ..., -0.73518964,\n",
+       "        -0.68519336, -0.27575966],\n",
+       "       [-0.84488505,  0.1597866 , -0.47073225, ..., -0.24020459,\n",
+       "        -0.37110101,  1.17073215],\n",
+       "       [-0.84488505, -0.8730192 ,  0.04624525, ..., -0.20212881,\n",
+       "        -0.47378505, -0.87137393]])"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "standardized_data = scaler.transform(X)\n",
+    "standardized_data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "6cffa083",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.068979Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.068458Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.077283Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.076012Z"
+    },
+    "papermill": {
+     "duration": 0.024783,
+     "end_time": "2024-07-17T12:32:26.079813",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.055030",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[ 0.63994726,  0.84832379,  0.14964075, ...,  0.20401277,\n",
+       "         0.46849198,  1.4259954 ],\n",
+       "       [-0.84488505, -1.12339636, -0.16054575, ..., -0.68442195,\n",
+       "        -0.36506078, -0.19067191],\n",
+       "       [ 1.23388019,  1.94372388, -0.26394125, ..., -1.10325546,\n",
+       "         0.60439732, -0.10558415],\n",
+       "       ...,\n",
+       "       [ 0.3429808 ,  0.00330087,  0.14964075, ..., -0.73518964,\n",
+       "        -0.68519336, -0.27575966],\n",
+       "       [-0.84488505,  0.1597866 , -0.47073225, ..., -0.24020459,\n",
+       "        -0.37110101,  1.17073215],\n",
+       "       [-0.84488505, -0.8730192 ,  0.04624525, ..., -0.20212881,\n",
+       "        -0.47378505, -0.87137393]])"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X = standardized_data\n",
+    "X"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "08133da5",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.106545Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.106106Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.111310Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.110130Z"
+    },
+    "papermill": {
+     "duration": 0.021979,
+     "end_time": "2024-07-17T12:32:26.114264",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.092285",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# TRAIN TEST SPLIT"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "12636d88",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.142408Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.141985Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.151945Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.150783Z"
+    },
+    "papermill": {
+     "duration": 0.028154,
+     "end_time": "2024-07-17T12:32:26.154769",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.126615",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=45)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "bcf92f49",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.182643Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.182192Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.189531Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.188119Z"
+    },
+    "papermill": {
+     "duration": 0.024584,
+     "end_time": "2024-07-17T12:32:26.192293",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.167709",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(768, 8) (614, 8) (154, 8)\n",
+      "(768,) (614,) (154,)\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(X.shape, X_train.shape, X_test.shape)\n",
+    "print(y.shape, y_train.shape, y_test.shape)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "22d26134",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.219634Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.219181Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.224432Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.223201Z"
+    },
+    "papermill": {
+     "duration": 0.021856,
+     "end_time": "2024-07-17T12:32:26.227349",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.205493",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# MODEL COMPARISION :TRANING AND EVALUATION"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "6f24744c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.254921Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.254467Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.634312Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.633107Z"
+    },
+    "papermill": {
+     "duration": 0.396852,
+     "end_time": "2024-07-17T12:32:26.637195",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.240343",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "models = [LogisticRegression, SVC, DecisionTreeClassifier, RandomForestClassifier]\n",
+    "accuracy_scores = []\n",
+    "precision_scores = []\n",
+    "recall_scores = []\n",
+    "f1_scores = []\n",
+    "\n",
+    "for model in models:\n",
+    "    classifier = model().fit(X_train, y_train)\n",
+    "    y_pred = classifier.predict(X_test)\n",
+    "    \n",
+    "    accuracy_scores.append(accuracy_score(y_test, y_pred))\n",
+    "    precision_scores.append(precision_score(y_test, y_pred))\n",
+    "    recall_scores.append(recall_score(y_test, y_pred))\n",
+    "    f1_scores.append(f1_score(y_test, y_pred))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "9b3edd06",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.664795Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.664349Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.681395Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.680173Z"
+    },
+    "papermill": {
+     "duration": 0.034085,
+     "end_time": "2024-07-17T12:32:26.683889",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.649804",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Accuracy</th>\n",
+       "      <th>Precision</th>\n",
+       "      <th>Recall</th>\n",
+       "      <th>F1 Score</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Model</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Logistic Regression</th>\n",
+       "      <td>0.785714</td>\n",
+       "      <td>0.769231</td>\n",
+       "      <td>0.555556</td>\n",
+       "      <td>0.645161</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>SVM</th>\n",
+       "      <td>0.792208</td>\n",
+       "      <td>0.789474</td>\n",
+       "      <td>0.555556</td>\n",
+       "      <td>0.652174</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Decision Tree</th>\n",
+       "      <td>0.649351</td>\n",
+       "      <td>0.500000</td>\n",
+       "      <td>0.462963</td>\n",
+       "      <td>0.480769</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Random Forest</th>\n",
+       "      <td>0.772727</td>\n",
+       "      <td>0.731707</td>\n",
+       "      <td>0.555556</td>\n",
+       "      <td>0.631579</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                     Accuracy  Precision    Recall  F1 Score\n",
+       "Model                                                       \n",
+       "Logistic Regression  0.785714   0.769231  0.555556  0.645161\n",
+       "SVM                  0.792208   0.789474  0.555556  0.652174\n",
+       "Decision Tree        0.649351   0.500000  0.462963  0.480769\n",
+       "Random Forest        0.772727   0.731707  0.555556  0.631579"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "classification_metrics_df = pd.DataFrame({\n",
+    "    \"Model\": [\"Logistic Regression\", \"SVM\", \"Decision Tree\", \"Random Forest\"],\n",
+    "    \"Accuracy\": accuracy_scores,\n",
+    "    \"Precision\": precision_scores,\n",
+    "    \"Recall\": recall_scores,\n",
+    "    \"F1 Score\": f1_scores\n",
+    "})\n",
+    "\n",
+    "classification_metrics_df.set_index('Model', inplace=True)\n",
+    "classification_metrics_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "697a10ff",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-07-17T12:32:26.712513Z",
+     "iopub.status.busy": "2024-07-17T12:32:26.711312Z",
+     "iopub.status.idle": "2024-07-17T12:32:26.716460Z",
+     "shell.execute_reply": "2024-07-17T12:32:26.715335Z"
+    },
+    "papermill": {
+     "duration": 0.022465,
+     "end_time": "2024-07-17T12:32:26.719200",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.696735",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# INFERENCE\n",
+    "\n",
+    "#SVM PROVES THE MODEL ACCURATELY"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6f0ae770",
+   "metadata": {
+    "papermill": {
+     "duration": 0.012732,
+     "end_time": "2024-07-17T12:32:26.746108",
+     "exception": false,
+     "start_time": "2024-07-17T12:32:26.733376",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 5404139,
+     "sourceId": 8975515,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 30746,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.13"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 8.433964,
+   "end_time": "2024-07-17T12:32:27.481409",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2024-07-17T12:32:19.047445",
+   "version": "2.5.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
